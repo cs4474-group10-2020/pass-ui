@@ -1,0 +1,41 @@
+import path from 'path';
+import fs from 'fs';
+import actionTypes from './actionTypes';
+import { getPasswordStorePath } from '../service';
+
+// eslint-disable-next-line import/prefer-default-export
+export const getDirectoryContents = (dirs) => (dispatch) => {
+    const fullPath = path.join(getPasswordStorePath(), ...dirs);
+
+    dispatch({
+        type: actionTypes.FETCH_DIRECTORY_CONTENTS_STARTED,
+        payload: dirs,
+    });
+
+    fs.readdir(fullPath, { withFileTypes: true }, (err, files) => {
+        if (err) {
+            dispatch({
+                type: actionTypes.FETCH_DIRECTORY_CONTENTS_FAILURE,
+                payload: err.message,
+            });
+        } else {
+            const directoryChildren = {
+                files: files.filter((file) => file.isFile()),
+                directories: files.filter((file) => file.isDirectory()),
+            };
+
+            dispatch({
+                type: actionTypes.FETCH_DIRECTORY_CONTENTS_SUCCESS,
+                payload: {
+                    path: dirs,
+                    directoryChildren,
+                },
+            });
+        }
+
+        dispatch({
+            type: actionTypes.FETCH_DIRECTORY_CONTENTS_ENDED,
+            payload: dirs,
+        });
+    });
+};

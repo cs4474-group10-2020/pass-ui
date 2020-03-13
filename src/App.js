@@ -1,26 +1,18 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import ReactDOM from 'react-dom';
+import { Provider } from 'react-redux';
+import { getDirectoryContents } from './actions/directory';
+import configureStore from './configureStore';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
-}
+const app = (renderTo) => {
+    const store = configureStore();
+    store.dispatch(getDirectoryContents(['./']));
 
-export default App;
+    ReactDOM.render(
+        <Provider store={store}>
+            <div />
+        </Provider>, renderTo,
+    );
+};
+
+export default app;
