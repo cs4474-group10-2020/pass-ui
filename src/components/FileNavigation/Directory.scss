@@ -1,0 +1,13 @@
+
+.directory-name {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.directory-name-text {
+    flex-grow: 1;
+    word-wrap: break-word;
+    line-break: anywhere;
+    margin: 0 0.25rem;
+}

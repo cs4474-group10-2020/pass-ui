@@ -1,5 +1,5 @@
-import path from 'path';
 import actionTypes from '../actions/actionTypes';
+import { concatPaths } from '../service';
 
 const DEFAULT_STATE = {
     data: {
@@ -17,7 +17,7 @@ export default (state = DEFAULT_STATE, action) => {
                     ...state.data,
                     loadingPaths: [
                         ...state.data.loadingPaths,
-                        path.join(...(action.payload)),
+                        concatPaths(action.payload),
                     ],
                 },
             };
@@ -25,9 +25,10 @@ export default (state = DEFAULT_STATE, action) => {
             return {
                 ...state,
                 data: {
+                    ...state.data,
                     store: {
                         ...state.data.store,
-                        [path.join(...(action.payload.path))]: action.payload.directoryChildren,
+                        [concatPaths(action.payload.path)]: action.payload.directoryChildren,
                     },
                 },
             };
@@ -36,10 +37,13 @@ export default (state = DEFAULT_STATE, action) => {
                 ...state,
                 data: {
                     ...state.data,
-                    loadingPaths: state.data.loadingPaths.filter((currentPath) => currentPath !== path.join(...(action.payload))),
+                    loadingPaths: state.data.loadingPaths.filter((currentPath) => currentPath !== concatPaths(action.payload)),
                 },
             };
         default:
             return state;
     }
 };
+
+
+export const getDirectory = (state, path) => state.data.store[concatPaths(path)];

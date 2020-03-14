@@ -1,0 +1,13 @@
+
+.file {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
+
+.file-name {
+    flex-grow: 1;
+    word-wrap: break-word;
+    line-break: anywhere;
+    margin: 0 0.25rem;
+}

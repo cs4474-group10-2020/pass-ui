@@ -1,11 +1,10 @@
-import path from 'path';
 import fs from 'fs';
 import actionTypes from './actionTypes';
-import { getPasswordStorePath } from '../service';
+import { concatPaths, getPasswordStorePath } from '../service';
 
 // eslint-disable-next-line import/prefer-default-export
 export const getDirectoryContents = (dirs) => (dispatch) => {
-    const fullPath = path.join(getPasswordStorePath(), ...dirs);
+    const fullPath = concatPaths([getPasswordStorePath(), ...dirs]);
 
     dispatch({
         type: actionTypes.FETCH_DIRECTORY_CONTENTS_STARTED,
@@ -20,8 +19,8 @@ export const getDirectoryContents = (dirs) => (dispatch) => {
             });
         } else {
             const directoryChildren = {
-                files: files.filter((file) => file.isFile()),
-                directories: files.filter((file) => file.isDirectory()),
+                files: files.filter((file) => file.isFile()).map((file) => file.name),
+                directories: files.filter((file) => file.isDirectory()).map((file) => file.name),
             };
 
             dispatch({

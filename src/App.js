@@ -1,8 +1,9 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { getDirectoryContents } from './actions/directory';
 import configureStore from './configureStore';
+import { getDirectoryContents } from './actions/directory';
+import Layout from './components/Layout';
 
 const app = (renderTo) => {
     const store = configureStore();
@@ -10,7 +11,7 @@ const app = (renderTo) => {
 
     ReactDOM.render(
         <Provider store={store}>
-            <div />
+            <Layout />
         </Provider>, renderTo,
     );
 };
