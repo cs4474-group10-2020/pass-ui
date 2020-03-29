@@ -3,7 +3,10 @@
     display: flex;
     flex-direction: row;
     width: 100%;
+    height: 100vh;
 }
 .directory-view-panel {
     width: 50%;
+    margin: 10px;
+    overflow-y: scroll;
 }

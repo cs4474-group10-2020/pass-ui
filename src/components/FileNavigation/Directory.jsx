@@ -14,7 +14,7 @@ import AddDirectoryForm from './AddDirectoryForm';
 
 
 const Directory = ({
-    directoryChildren, path, getDirectoryContents, onFileOpen, selectedItemPath, onSelectItem, canRename,
+    directoryChildren, path, getDirectoryContents, onFileOpen, selectedItemPath, onSelectItem, canRename, onCreatePassword,
 }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [isBeingRenamed, setIsBeingRenamed] = useState(false);
@@ -23,7 +23,7 @@ const Directory = ({
     const pathString = concatPaths(path);
     const isSelected = pathString === selectedItemPath;
     const onNewPassword = () => {
-        // TODO
+        onCreatePassword(path);
     };
     const onNewDirectory = () => {
         getDirectoryContents(path);
@@ -130,6 +130,7 @@ const Directory = ({
                                 path={childPath}
                                 onFileOpen={onFileOpen}
                                 canRename
+                                onCreatePassword={onCreatePassword}
                             />
                         );
                     }))}
@@ -163,6 +164,7 @@ Directory.propTypes = {
     selectedItemPath: PropTypes.string.isRequired,
     onSelectItem: PropTypes.func.isRequired,
     canRename: PropTypes.bool,
+    onCreatePassword: PropTypes.func.isRequired,
 };
 
 Directory.defaultProps = {

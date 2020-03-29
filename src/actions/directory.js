@@ -11,6 +11,8 @@ export const getDirectoryContents = (dirs) => (dispatch) => {
         payload: dirs,
     });
 
+    const filterDirectory = (file) => !['.gitattributes', '.gpg-id', '.git'].includes(file.name);
+
     fs.readdir(fullPath, { withFileTypes: true }, (err, files) => {
         if (err) {
             dispatch({
@@ -19,8 +21,8 @@ export const getDirectoryContents = (dirs) => (dispatch) => {
             });
         } else {
             const directoryChildren = {
-                files: files.filter((file) => file.isFile()).map((file) => file.name),
-                directories: files.filter((file) => file.isDirectory()).map((file) => file.name),
+                files: files.filter(filterDirectory).filter((file) => file.isFile()).map((file) => file.name),
+                directories: files.filter(filterDirectory).filter((file) => file.isDirectory()).map((file) => file.name),
             };
 
             dispatch({
