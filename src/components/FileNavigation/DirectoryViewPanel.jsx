@@ -4,7 +4,7 @@ import { Card } from 'react-bootstrap';
 import Directory from '../../containers/FileNavigation/Directory';
 
 const DirectoryViewPanel = ({
-    onFileOpen, selectedItemPath, onSelectItem, onCreatePassword,
+    onFileOpen, selectedItemPath, onSelectItem, onCreatePassword, onEditPassword,
 }) => (
     <Card className="directory-view-panel">
         <Directory
@@ -13,6 +13,7 @@ const DirectoryViewPanel = ({
             onFileOpen={onFileOpen}
             path={['./']}
             onCreatePassword={onCreatePassword}
+            onEditPassword={onEditPassword}
         />
     </Card>
 );
@@ -22,6 +23,7 @@ DirectoryViewPanel.propTypes = {
     selectedItemPath: PropTypes.string.isRequired,
     onSelectItem: PropTypes.func.isRequired,
     onCreatePassword: PropTypes.func.isRequired,
+    onEditPassword: PropTypes.func.isRequired,
 };
 
 export default DirectoryViewPanel;

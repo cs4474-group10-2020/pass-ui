@@ -42,17 +42,17 @@ export const fetchPassword = (path) => (dispatch) => {
     });
 };
 
-export const createPassword = (path, password) => (dispatch) => {
+export const savePassword = (path, password) => (dispatch) => {
     const fullPath = trimGPGExtension(concatPaths(path));
 
     dispatch({
-        type: actionTypes.CREATE_PASSWORD_STARTED,
+        type: actionTypes.SAVE_PASSWORD_STARTED,
         payload: path,
     });
     return new Promise((resolutionFunc, rejectionFunc) => {
         execa(
             'pass',
-            ['insert', fullPath, '--multiline'],
+            ['insert', fullPath, '--multiline', '--force'],
             {
                 env: {
                     ...(process.env),
@@ -65,7 +65,7 @@ export const createPassword = (path, password) => (dispatch) => {
         )
             .then((process) => {
                 dispatch({
-                    type: actionTypes.CREATE_PASSWORD_SUCCESS,
+                    type: actionTypes.SAVE_PASSWORD_SUCCESS,
                     payload: process,
                 });
                 getDirectoryContents(path.slice(0, -1))(dispatch);
@@ -73,14 +73,14 @@ export const createPassword = (path, password) => (dispatch) => {
             })
             .catch((error) => {
                 dispatch({
-                    type: actionTypes.CREATE_PASSWORD_FAILURE,
+                    type: actionTypes.SAVE_PASSWORD_FAILURE,
                     payload: error,
                 });
                 rejectionFunc();
             })
             .finally(() => {
                 dispatch({
-                    type: actionTypes.CREATE_PASSWORD_ENDED,
+                    type: actionTypes.SAVE_PASSWORD_ENDED,
                     payload: path,
                 });
             });

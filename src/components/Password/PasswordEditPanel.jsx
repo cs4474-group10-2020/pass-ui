@@ -9,22 +9,30 @@ import { concatPaths, trimGPGExtension } from '../../service';
 import './PasswordEditPanel.scss';
 
 const PasswordEditPanel = ({
-    password, path, fileName, onSave, onClose,
+    password, path, fileName, onSave, onClose, editFileName,
 }) => {
     const [currentPassword, setCurrentPassword] = useState(password.password);
-    const [fields, setFields] = useState(Object.entries(password.fields));
+    const [fields, setFields] = useState(Object.entries(password.fields).map(([key, value]) => ({ key, value })));
     const [currentFileName, setCurrentFileName] = useState(fileName);
 
     return (
         <Card className="password-display-panel">
             <Card.Header>
-                {trimGPGExtension(concatPaths(path))}
-                <FormControl
-                    placeholder="Name"
-                    aria-label="Name"
-                    value={currentFileName}
-                    onChange={(changeEvent) => setCurrentFileName(changeEvent.target.value)}
-                />
+                {editFileName ? (
+                    <>
+                        {trimGPGExtension(concatPaths(path))}
+                        <FormControl
+                            placeholder="Name"
+                            aria-label="Name"
+                            value={currentFileName}
+                            onChange={(changeEvent) => setCurrentFileName(changeEvent.target.value)}
+                        />
+                    </>
+                ) : (
+                    <>
+                        {trimGPGExtension(concatPaths([...path, currentFileName]))}
+                    </>
+                ) }
             </Card.Header>
             <ListGroup variant="flush" className="field-group">
                 <ListGroup.Item>
@@ -105,6 +113,9 @@ const PasswordEditPanel = ({
             >
                 <FontAwesomeIcon icon={faCheck} />
             </Button>
+            <Button className="password-edit-panel-button" variant="danger" onClick={onClose}>
+                <FontAwesomeIcon icon={faTimes} />
+            </Button>
         </Card>
     );
 };
@@ -118,6 +129,7 @@ PasswordEditPanel.propTypes = {
     fileName: PropTypes.string.isRequired,
     onSave: PropTypes.func.isRequired,
     onClose: PropTypes.func.isRequired,
+    editFileName: PropTypes.bool.isRequired,
 };
 
 export default PasswordEditPanel;

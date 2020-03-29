@@ -19,6 +19,10 @@ export const getDirectoryContents = (dirs) => (dispatch) => {
                 type: actionTypes.FETCH_DIRECTORY_CONTENTS_FAILURE,
                 payload: err.message,
             });
+            // refresh the tree
+            if (dirs.length > 1) {
+                getDirectoryContents(dirs.slice(0, -1))(dispatch);
+            }
         } else {
             const directoryChildren = {
                 files: files.filter(filterDirectory).filter((file) => file.isFile()).map((file) => file.name),
@@ -37,6 +41,34 @@ export const getDirectoryContents = (dirs) => (dispatch) => {
         dispatch({
             type: actionTypes.FETCH_DIRECTORY_CONTENTS_ENDED,
             payload: dirs,
+        });
+    });
+};
+
+export const createDirectory = (path) => (dispatch) => {
+    const fullPath = concatPaths([getPasswordStorePath(), ...path]);
+
+    dispatch({
+        type: actionTypes.CREATE_DIRECTORY_STARTED,
+        payload: path,
+    });
+
+    fs.mkdir(fullPath, (err) => {
+        if (err) {
+            dispatch({
+                type: actionTypes.CREATE_DIRECTORY_FAILURE,
+                payload: err.message,
+            });
+        } else {
+            dispatch({
+                type: actionTypes.CREATE_DIRECTORY_SUCCESS,
+                payload: path,
+            });
+            getDirectoryContents(path.slice(0, -1))(dispatch);
+        }
+        dispatch({
+            type: actionTypes.CREATE_DIRECTORY_ENDED,
+            payload: path,
         });
     });
 };

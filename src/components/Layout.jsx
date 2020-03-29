@@ -5,6 +5,7 @@ import './Layout.scss';
 import { concatPaths, ITEM_TYPES, MODES } from '../service';
 import PasswordDisplayPanel from '../containers/Password/PasswordDisplayPanel';
 import PasswordCreatePanel from '../containers/Password/PasswordCreatePanel';
+import PasswordEditPanel from '../containers/Password/PasswordEditPanel';
 
 const Layout = ({ getPassword }) => {
     const [fileOpen, setFileOpen] = useState(null);
@@ -36,6 +37,11 @@ const Layout = ({ getPassword }) => {
         setFileOpen(path);
     };
 
+    const onEditPassword = (path) => {
+        setMode(MODES.edit);
+        getPassword(path).then(() => setFileOpen(path));
+    };
+
     return (
         <div className="layout">
             <DirectoryViewPanel
@@ -43,9 +49,11 @@ const Layout = ({ getPassword }) => {
                 onFileOpen={onFileOpen}
                 onSelectItem={onSelectItem}
                 onCreatePassword={onCreatePassword}
+                onEditPassword={onEditPassword}
             />
             {fileOpen && mode === MODES.view && <PasswordDisplayPanel />}
             {fileOpen && mode === MODES.create && <PasswordCreatePanel path={fileOpen} fileName="" onClose={onClose} />}
+            {fileOpen && mode === MODES.edit && <PasswordEditPanel path={fileOpen} onClose={onClose} />}
         </div>
     );
 };
