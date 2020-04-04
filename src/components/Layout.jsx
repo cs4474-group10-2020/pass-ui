@@ -9,10 +9,9 @@ const Layout = () => {
     const [fileOpen, setFileOpen] = useState([]);
     const [selectedItemPath, setSelectedItemPath] = useState('');
     const [selectedItemType, setSelectedItemType] = useState(ITEM_TYPES.none);
-    const [isDisabled, toggleDisabled] = useState(false);
-    const [syncText, setSyncText] = useState('');
+    const [isDisabled, toggleDisabled] = useState(true);
     const [isSpinning, toggleSpin] = useState(true);
-    const [showModal, setShowModal] = useState(true);
+    const [showModal, setShowModal] = useState(false);
 
     const onSelectItem = (path, type) => {
         setSelectedItemPath(concatPaths(path));
@@ -23,7 +22,7 @@ const Layout = () => {
     return (
         <div>
             <div className="header">
-                <HeaderComponent syncText={syncText} isDisabled={isDisabled} isSpinning={isSpinning} setShowModal={setShowModal} />
+                <HeaderComponent isDisabled={isDisabled} isSpinning={isSpinning} setShowModal={setShowModal} />
             </div>
             <div className="layout">
                 <DirectoryViewPanel selectedItemPath={selectedItemPath} onFileOpen={setFileOpen} onSelectItem={onSelectItem} />
