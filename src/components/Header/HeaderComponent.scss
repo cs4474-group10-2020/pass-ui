@@ -3,7 +3,21 @@
     position: relative;
 }
 
-.button-of-header {
+.header-item {
     margin-right: 10px;
     margin-left: 10px;
+}
+
+.dropdown > button {
+    align-items: center;
+    display: flex;
+    &:after {
+        border-top: .5em solid;
+        border-right: .5em solid transparent;
+        border-left: .5em solid transparent;
+    }
+}
+
+.navbar-nav {
+    align-items: center;
 }

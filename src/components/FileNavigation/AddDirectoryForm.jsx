@@ -30,7 +30,7 @@ const AddDirectoryForm = ({ onSubmit, onCancel, initialValue }) => {
                     <FontAwesomeIcon icon={faCheck} />
                 </Button>
                 <Button
-                    variant="outline-danger"
+                    variant="outline-secondary"
                     onClick={() => onCancel()}
                 >
                     <FontAwesomeIcon icon={faTimes} />

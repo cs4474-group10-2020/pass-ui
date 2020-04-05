@@ -11,6 +11,10 @@ export const ITEM_TYPES = Object.freeze({
     none: 0, file: 1, directory: 2,
 });
 
+export const DIRECTORY_EDIT_TYPES = Object.freeze({
+    none: 0, rename: 1, addChild: 2,
+});
+
 export const MODES = Object.freeze({
     none: 0, view: 1, create: 2, edit: 3,
 });

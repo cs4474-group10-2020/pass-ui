@@ -2,7 +2,9 @@ import {
     Button, Card, FormControl, InputGroup, ListGroup,
 } from 'react-bootstrap';
 import React, { useState } from 'react';
-import { faCheck, faPlus, faTimes } from '@fortawesome/free-solid-svg-icons';
+import {
+    faCheck, faPlus, faTimes, faTrashAlt,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 import { concatPaths, trimGPGExtension } from '../../service';
@@ -82,40 +84,41 @@ const PasswordEditPanel = ({
                                         setFields(fields.filter((field, fieldIndex) => fieldIndex !== index));
                                     }}
                                 >
-                                    <FontAwesomeIcon icon={faTimes} />
+                                    <FontAwesomeIcon icon={faTrashAlt} />
                                 </Button>
                             </InputGroup.Append>
                         </InputGroup>
 
                     </ListGroup.Item>
                 ))}
+                <Button className="password-edit-panel-button" variant="primary" onClick={() => setFields([...fields, { key: '', value: '' }])}>
+                    <FontAwesomeIcon icon={faPlus} />
+                </Button>
             </ListGroup>
-
-            <Button className="password-edit-panel-button" variant="primary" onClick={() => setFields([...fields, { key: '', value: '' }])}>
-                <FontAwesomeIcon icon={faPlus} />
-            </Button>
-            <Button
-                className="password-edit-panel-button"
-                variant="success"
-                onClick={() => {
-                    onSave(
-                        [...path, currentFileName],
-                        ({
-                            password: currentPassword,
-                            fields: fields.reduce((accumulator, { key, value }) => ({
-                                ...accumulator,
-                                [key]: value,
-                            }), {}),
-                        }),
-                    );
-                    onClose();
-                }}
-            >
-                <FontAwesomeIcon icon={faCheck} />
-            </Button>
-            <Button className="password-edit-panel-button" variant="danger" onClick={onClose}>
-                <FontAwesomeIcon icon={faTimes} />
-            </Button>
+            <div className="button-group">
+                <Button className="password-edit-panel-button cancel-button" variant="secondary" onClick={onClose}>
+                    <FontAwesomeIcon icon={faTimes} />
+                </Button>
+                <Button
+                    className="password-edit-panel-button accept-button"
+                    variant="success"
+                    onClick={() => {
+                        onSave(
+                            [...path, currentFileName],
+                            ({
+                                password: currentPassword,
+                                fields: fields.reduce((accumulator, { key, value }) => ({
+                                    ...accumulator,
+                                    [key]: value,
+                                }), {}),
+                            }),
+                        );
+                        onClose();
+                    }}
+                >
+                    <FontAwesomeIcon icon={faCheck} />
+                </Button>
+            </div>
         </Card>
     );
 };

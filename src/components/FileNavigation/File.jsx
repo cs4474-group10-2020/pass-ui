@@ -15,7 +15,7 @@ const File = ({
     const [isBeingRenamed, setIsBeingRenamed] = useState(false);
     const fileName = trimGPGExtension(path[path.length - 1]);
     const pathString = concatPaths(path);
-    const isSelected = pathString === selectedItemPath;
+    const isSelected = pathString === concatPaths(selectedItemPath);
 
     const onRename = () => {
         setIsBeingRenamed(true);
@@ -85,7 +85,7 @@ const File = ({
 File.propTypes = {
     path: PropTypes.arrayOf(PropTypes.string).isRequired,
     onOpen: PropTypes.func.isRequired,
-    selectedItemPath: PropTypes.string.isRequired,
+    selectedItemPath: PropTypes.arrayOf(PropTypes.string).isRequired,
     onSelectItem: PropTypes.func.isRequired,
     onEditPassword: PropTypes.func.isRequired,
     onDeleteFile: PropTypes.func.isRequired,
