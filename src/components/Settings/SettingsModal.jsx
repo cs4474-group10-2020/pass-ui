@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import { Modal, Button } from 'react-bootstrap';
 import TemplateSetting from './TemplateSetting';
+import './SettingsModal.scss';
 
 const SettingsModal = ({
     template, setTemplate, onHide, ...props
@@ -38,8 +39,10 @@ const SettingsModal = ({
                 <TemplateSetting template={draftTemplate} setTemplate={setDraftTemplate} setTemplateValid={setTemplateValid} />
             </Modal.Body>
             <Modal.Footer>
-                <Button variant="outline-danger" onClick={discardAndHide}>Cancel</Button>
-                <Button variant="success" onClick={saveAndHide}>Save</Button>
+                <div className="settings-modal-footer">
+                    <Button variant="outline-danger" onClick={discardAndHide}>Cancel</Button>
+                    <Button variant="success" onClick={saveAndHide}>Save</Button>
+                </div>
             </Modal.Footer>
         </Modal>
     );
