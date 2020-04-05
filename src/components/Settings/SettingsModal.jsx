@@ -40,7 +40,7 @@ const SettingsModal = ({
             </Modal.Body>
             <Modal.Footer>
                 <div className="settings-modal-footer">
-                    <Button variant="outline-danger" onClick={discardAndHide}>Cancel</Button>
+                    <Button variant="secondary" onClick={discardAndHide}>Cancel</Button>
                     <Button variant="success" onClick={saveAndHide}>Save</Button>
                 </div>
             </Modal.Footer>

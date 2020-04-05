@@ -2,12 +2,13 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { savePassword } from '../../actions/password';
 import PasswordEditPanel from '../../components/Password/PasswordEditPanel';
+import { getTemplate } from '../../reducers';
 
 // TODO template
 const mapStateToProps = (state) => ({
     password: {
         password: '',
-        fields: {},
+        fields: getTemplate(state).map((key) => ({ key, value: '' })),
     },
     editFileName: true,
 });

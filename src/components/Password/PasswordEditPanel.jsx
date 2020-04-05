@@ -1,10 +1,9 @@
+/* eslint-disable react/no-array-index-key */
 import {
     Button, Card, FormControl, InputGroup, ListGroup,
 } from 'react-bootstrap';
 import React, { useState } from 'react';
-import {
-    faCheck, faPlus, faTimes, faTrashAlt,
-} from '@fortawesome/free-solid-svg-icons';
+import { faBars, faPlus, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
 import { concatPaths, trimGPGExtension } from '../../service';
@@ -14,8 +13,40 @@ const PasswordEditPanel = ({
     password, path, fileName, onSave, onClose, editFileName,
 }) => {
     const [currentPassword, setCurrentPassword] = useState(password.password);
-    const [fields, setFields] = useState(Object.entries(password.fields).map(([key, value]) => ({ key, value })));
+    const [fields, setFields] = useState(password.fields);
     const [currentFileName, setCurrentFileName] = useState(fileName);
+    const [dragIndex, setDragIndex] = useState(null);
+
+    const preventDrag = (event) => {
+        event.preventDefault();
+        event.stopPropagation();
+    };
+
+    const allowDrag = (event) => {
+        event.preventDefault();
+    };
+
+    const startDrag = (event, fieldIndex) => {
+        setDragIndex(fieldIndex);
+    };
+
+    const dropDrag = (event, targetIndex) => {
+        event.preventDefault();
+
+        const newFields = fields.slice();
+        const movedInput = fields[dragIndex];
+
+        if (dragIndex !== targetIndex) {
+            const insertIndex = targetIndex > dragIndex ? targetIndex + 1 : targetIndex;
+            newFields.splice(insertIndex, 0, movedInput);
+            const deleteIndex = targetIndex > dragIndex ? dragIndex : dragIndex + 1;
+            newFields.splice(deleteIndex, 1);
+
+            setFields(newFields);
+        }
+
+        setDragIndex(null);
+    };
 
     return (
         <Card className="password-display-panel">
@@ -45,60 +76,67 @@ const PasswordEditPanel = ({
                         onChange={(changeEvent) => setCurrentPassword(changeEvent.target.value)}
                     />
                 </ListGroup.Item>
-                {fields.map(({ key, value }, index) => (
-                    // eslint-disable-next-line react/no-array-index-key
-                    <ListGroup.Item key={index}>
-                        <InputGroup>
-                            <FormControl
-                                placeholder="Field name"
-                                aria-label="Field name"
-                                value={key}
-                                onChange={(changeEvent) => setFields(fields.map((field, fieldIndex) => {
-                                    if (index !== fieldIndex) {
-                                        return field;
-                                    }
-                                    return {
-                                        key: changeEvent.target.value,
-                                        value,
-                                    };
-                                }))}
-                            />
-                            <FormControl
-                                placeholder="Value"
-                                aria-label="Value"
-                                value={value}
-                                onChange={(changeEvent) => setFields(fields.map((field, fieldIndex) => {
-                                    if (index !== fieldIndex) {
-                                        return field;
-                                    }
-                                    return {
-                                        key,
-                                        value: changeEvent.target.value,
-                                    };
-                                }))}
-                            />
-                            <InputGroup.Append>
-                                <Button
-                                    variant="outline-danger"
-                                    onClick={() => {
-                                        setFields(fields.filter((field, fieldIndex) => fieldIndex !== index));
-                                    }}
-                                >
-                                    <FontAwesomeIcon icon={faTrashAlt} />
-                                </Button>
-                            </InputGroup.Append>
-                        </InputGroup>
+                <ListGroup.Item>
+                    {fields.map(({ key, value }, index) => (
+                        <div
+                            key={index}
+                            className="password-field"
+                            draggable
+                            onDragStart={(event) => startDrag(event, index)}
+                            onDrop={(event) => dropDrag(event, index)}
+                            onDragOver={allowDrag}
+                        >
+                            <FontAwesomeIcon className="field-drag-icon" icon={faBars} size="1x" />
+                            <InputGroup draggable onDragStart={preventDrag}>
+                                <FormControl
+                                    placeholder="Field name"
+                                    aria-label="Field name"
+                                    value={key}
+                                    onChange={(changeEvent) => setFields(fields.map((field, fieldIndex) => {
+                                        if (index !== fieldIndex) {
+                                            return field;
+                                        }
+                                        return {
+                                            key: changeEvent.target.value,
+                                            value,
+                                        };
+                                    }))}
+                                />
+                                <FormControl
+                                    placeholder="Value"
+                                    aria-label="Value"
+                                    value={value}
+                                    onChange={(changeEvent) => setFields(fields.map((field, fieldIndex) => {
+                                        if (index !== fieldIndex) {
+                                            return field;
+                                        }
+                                        return {
+                                            key,
+                                            value: changeEvent.target.value,
+                                        };
+                                    }))}
+                                />
+                                <InputGroup.Append>
+                                    <Button
+                                        variant="outline-danger"
+                                        onClick={() => {
+                                            setFields(fields.filter((field, fieldIndex) => fieldIndex !== index));
+                                        }}
+                                    >
+                                        <FontAwesomeIcon icon={faTrashAlt} />
+                                    </Button>
+                                </InputGroup.Append>
+                            </InputGroup>
 
-                    </ListGroup.Item>
-                ))}
+                        </div>
+                    ))}
+                </ListGroup.Item>
                 <Button className="password-edit-panel-button" variant="primary" onClick={() => setFields([...fields, { key: '', value: '' }])}>
                     <FontAwesomeIcon icon={faPlus} />
                 </Button>
             </ListGroup>
             <div className="button-group">
-                <Button className="password-edit-panel-button cancel-button" variant="secondary" onClick={onClose}>
-                    <FontAwesomeIcon icon={faTimes} />
-                </Button>
+                <Button className="password-edit-panel-button cancel-button" variant="secondary" onClick={onClose}>Cancel</Button>
                 <Button
                     className="password-edit-panel-button accept-button"
                     variant="success"
@@ -107,16 +145,13 @@ const PasswordEditPanel = ({
                             [...path, currentFileName],
                             ({
                                 password: currentPassword,
-                                fields: fields.reduce((accumulator, { key, value }) => ({
-                                    ...accumulator,
-                                    [key]: value,
-                                }), {}),
+                                fields,
                             }),
                         );
                         onClose();
                     }}
                 >
-                    <FontAwesomeIcon icon={faCheck} />
+                    Save
                 </Button>
             </div>
         </Card>
@@ -126,7 +161,10 @@ const PasswordEditPanel = ({
 PasswordEditPanel.propTypes = {
     password: PropTypes.shape({
         password: PropTypes.string.isRequired,
-        fields: PropTypes.objectOf(PropTypes.string).isRequired,
+        fields: PropTypes.arrayOf(PropTypes.shape({
+            key: PropTypes.string.isRequired,
+            value: PropTypes.string.isRequired,
+        })).isRequired,
     }).isRequired,
     path: PropTypes.arrayOf(PropTypes.string).isRequired,
     fileName: PropTypes.string.isRequired,

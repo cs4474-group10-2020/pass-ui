@@ -13,7 +13,7 @@ const PasswordDisplayPanel = ({ password, path }) => (
                 {`Password: ${password.password}`}
                 <ClipboardButton text={password.password} />
             </ListGroup.Item>
-            {Object.entries(password.fields).map(([key, value]) => (
+            {password.fields.map(({ key, value }) => (
                 <ListGroup.Item key={key}>
                     {`${key}: ${value}`}
                     <ClipboardButton text={password.password} />
@@ -26,7 +26,10 @@ const PasswordDisplayPanel = ({ password, path }) => (
 PasswordDisplayPanel.propTypes = {
     password: PropTypes.shape({
         password: PropTypes.string.isRequired,
-        fields: PropTypes.objectOf(PropTypes.string).isRequired,
+        fields: PropTypes.arrayOf(PropTypes.shape({
+            key: PropTypes.string.isRequired,
+            value: PropTypes.string.isRequired,
+        })).isRequired,
     }).isRequired,
     path: PropTypes.arrayOf(PropTypes.string).isRequired,
 };

@@ -24,22 +24,20 @@ export const parsePassword = (passwordFile) => {
 
     return {
         password: fileLines[0],
-        fields: fileLines.slice(1).reduce((accumulator, currentValue) => {
-            if (/^\s*$/.test(currentValue)) {
-                return accumulator;
-            }
+        fields: fileLines.slice(1)
+            .filter((currentLine) => !/^\s*$/.test(currentLine))
+            .map((currentLine) => {
+                const [fieldName, fieldValue] = currentLine.split(/:\s*/);
 
-            const [fieldName, fieldValue] = currentValue.split(/:\s*/);
-
-            return {
-                ...accumulator,
-                [fieldName]: fieldValue,
-            };
-        }, {}),
+                return {
+                    key: fieldName,
+                    value: fieldValue,
+                };
+            }),
     };
 };
 
 export const getPasswordString = (password) => [
     `${password.password}\n`,
-    ...(Object.entries(password.fields).map(([key, value]) => `${key}: ${value}\n`)),
+    ...(password.fields.map(({ key, value }) => `${key}: ${value}\n`)),
 ].join('');
