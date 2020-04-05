@@ -1,7 +1,7 @@
 import actionTypes from '../actions/actionTypes';
 
 const DEFAULT_STATE = {
-    template: ['Username', 'Password', 'test1', 'test2', 'test3'],
+    template: ['Username', 'Password'],
 };
 
 export default (state = DEFAULT_STATE, action) => {
