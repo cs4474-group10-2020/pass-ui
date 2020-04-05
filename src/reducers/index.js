@@ -1,8 +1,10 @@
 import directoryReducer, * as directory from './directory';
 import passwordReducer, * as password from './password';
+import settingsReducer from './settings';
 
 export default {
     directory: directoryReducer,
+    settings: settingsReducer,
     password: passwordReducer,
 };
 

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import DirectoryViewPanel from './FileNavigation/DirectoryViewPanel';
-import VerticalModal from './VerticalModal/VerticalModal';
+import SettingsModal from '../containers/Settings/SettingsModal';
 import './Layout.scss';
 import {
     concatPaths, DIRECTORY_EDIT_TYPES, ITEM_TYPES, MODES,
@@ -110,7 +110,7 @@ const Layout = ({ getPassword, getDirectoryContents }) => {
                 {fileOpen && mode === MODES.edit && <PasswordEditPanel path={fileOpen} onClose={onClose} />}
 
             </div>
-            <VerticalModal
+            <SettingsModal
                 show={showModal}
                 onHide={() => setShowModal(false)}
             />
