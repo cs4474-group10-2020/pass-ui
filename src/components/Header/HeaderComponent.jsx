@@ -12,7 +12,8 @@ import { Button, Dropdown } from 'react-bootstrap';
 import { ITEM_TYPES, trimGPGExtension } from '../../service';
 
 const HeaderComponent = ({
-    selectedItemType, selectedItemPath, canEditSelectedItem, isLoading, setShowModal, onCreatePassword, onEditPassword, onDelete, onAddDirectory,
+    selectedItemType, selectedItemPath, canEditSelectedItem, isLoading, setShowModal,
+    onCreatePassword, onEditPassword, onDelete, onAddDirectory, onSync,
 }) => (
     <Navbar bg="dark" variant="dark">
         <Nav className="mr-auto">
@@ -42,7 +43,7 @@ const HeaderComponent = ({
             >
                 <FontAwesomeIcon icon={faTrashAlt} size="3x" />
             </Button>
-            <Button className="header-item">
+            <Button className="header-item" onClick={() => onSync()}>
                 <FontAwesomeIcon icon={faSyncAlt} size="3x" />
             </Button>
             {isLoading && <FontAwesomeIcon className="header-item" icon={faSpinner} size="3x" spin color="white" />}
@@ -65,6 +66,7 @@ HeaderComponent.propTypes = {
     onEditPassword: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
     onAddDirectory: PropTypes.func.isRequired,
+    onSync: PropTypes.func.isRequired,
 };
 
 export default HeaderComponent;

@@ -28,7 +28,10 @@ export default (state = DEFAULT_STATE, action) => {
                     ...state.data,
                     store: {
                         ...state.data.store,
-                        [concatPaths(action.payload.path)]: action.payload.directoryChildren,
+                        [concatPaths(action.payload.path)]: {
+                            ...action.payload.directoryChildren,
+                            path: action.payload.path,
+                        },
                     },
                 },
             };
@@ -47,3 +50,5 @@ export default (state = DEFAULT_STATE, action) => {
 
 
 export const getDirectory = (state, path) => state.data.store[concatPaths(path)];
+
+export const getAllDirectories = (state) => Object.values(state.data.store).map((directory) => directory.path);

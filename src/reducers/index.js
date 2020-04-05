@@ -8,6 +8,8 @@ export default {
 
 export const getDirectory = (state, path) => directory.getDirectory(state.directory, path);
 
+export const getAllDirectories = (state) => directory.getAllDirectories(state.directory);
+
 export const isPasswordLoading = (state) => password.isLoading(state.password);
 
 export const getPassword = (state) => password.getPassword(state.password);

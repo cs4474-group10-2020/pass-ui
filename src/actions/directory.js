@@ -1,6 +1,7 @@
 import fs from 'fs';
 import actionTypes from './actionTypes';
 import { concatPaths, getPasswordStorePath } from '../service';
+import { getAllDirectories } from '../reducers';
 
 // eslint-disable-next-line import/prefer-default-export
 export const getDirectoryContents = (dirs) => (dispatch) => {
@@ -71,4 +72,8 @@ export const createDirectory = (path) => (dispatch) => {
             payload: path,
         });
     });
+};
+
+export const refreshAllDirectoryContents = () => (dispatch, getState) => {
+    getAllDirectories(getState()).forEach((directoryPath) => getDirectoryContents(directoryPath)(dispatch));
 };
