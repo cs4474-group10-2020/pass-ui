@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import DirectoryViewPanel from './FileNavigation/DirectoryViewPanel';
+import HeaderComponent from './Header/HeaderComponent';
+import VerticalModal from './VerticalModal/VerticalModal';
 import './Layout.scss';
 import { concatPaths, ITEM_TYPES, MODES } from '../service';
 import PasswordDisplayPanel from '../containers/Password/PasswordDisplayPanel';
@@ -12,6 +14,9 @@ const Layout = ({ getPassword }) => {
     const [selectedItemPath, setSelectedItemPath] = useState('');
     const [selectedItemType, setSelectedItemType] = useState(ITEM_TYPES.none);
     const [mode, setMode] = useState(MODES.none);
+    const [isDisabled, toggleDisabled] = useState(true);
+    const [isSpinning, toggleSpin] = useState(true);
+    const [showModal, setShowModal] = useState(false);
 
     const onSelectItem = (path, type) => {
         setSelectedItemPath(concatPaths(path));
@@ -43,17 +48,27 @@ const Layout = ({ getPassword }) => {
     };
 
     return (
-        <div className="layout">
-            <DirectoryViewPanel
-                selectedItemPath={selectedItemPath}
-                onFileOpen={onFileOpen}
-                onSelectItem={onSelectItem}
-                onCreatePassword={onCreatePassword}
-                onEditPassword={onEditPassword}
+        <div>
+            <div className="header">
+                <HeaderComponent isDisabled={isDisabled} isSpinning={isSpinning} setShowModal={setShowModal} />
+            </div>
+            <div className="layout">
+                <DirectoryViewPanel
+                    selectedItemPath={selectedItemPath}
+                    onFileOpen={onFileOpen}
+                    onSelectItem={onSelectItem}
+                    onCreatePassword={onCreatePassword}
+                    onEditPassword={onEditPassword}
+                />
+                {fileOpen && mode === MODES.view && <PasswordDisplayPanel />}
+                {fileOpen && mode === MODES.create && <PasswordCreatePanel path={fileOpen} fileName="" onClose={onClose} />}
+                {fileOpen && mode === MODES.edit && <PasswordEditPanel path={fileOpen} onClose={onClose} />}
+
+            </div>
+            <VerticalModal
+                show={showModal}
+                onHide={() => setShowModal(false)}
             />
-            {fileOpen && mode === MODES.view && <PasswordDisplayPanel />}
-            {fileOpen && mode === MODES.create && <PasswordCreatePanel path={fileOpen} fileName="" onClose={onClose} />}
-            {fileOpen && mode === MODES.edit && <PasswordEditPanel path={fileOpen} onClose={onClose} />}
         </div>
     );
 };
