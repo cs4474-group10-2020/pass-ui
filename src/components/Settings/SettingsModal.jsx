@@ -7,6 +7,7 @@ const SettingsModal = ({
     template, setTemplate, onHide, ...props
 }) => {
     const [draftTemplate, setDraftTemplate] = useState(template);
+    const [isTemplateValid, setTemplateValid] = useState(true);
 
     const discardAndHide = () => {
         setDraftTemplate(template);
@@ -14,8 +15,10 @@ const SettingsModal = ({
     };
 
     const saveAndHide = () => {
-        setTemplate(draftTemplate);
-        onHide();
+        if (isTemplateValid) {
+            setTemplate(draftTemplate);
+            onHide();
+        }
     };
 
     return (
@@ -32,7 +35,7 @@ const SettingsModal = ({
                 </Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <TemplateSetting template={draftTemplate} setTemplate={setDraftTemplate} />
+                <TemplateSetting template={draftTemplate} setTemplate={setDraftTemplate} setTemplateValid={setTemplateValid} />
             </Modal.Body>
             <Modal.Footer>
                 <Button variant="outline-danger" onClick={discardAndHide}>Cancel</Button>

@@ -8,7 +8,7 @@ import { faBars, faPlus, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import './TemplateSetting.scss';
 
 const TemplateSetting = ({
-    template, setTemplate,
+    template, setTemplate, setTemplateValid,
 }) => {
     const [dragIndex, setDragIndex] = useState(null);
 
@@ -43,22 +43,38 @@ const TemplateSetting = ({
         setDragIndex(null);
     };
 
+    const hasEmptyField = (templateToCheck) => {
+        let foundEmpty = false;
+        templateToCheck.forEach((field) => {
+            if (field === '') {
+                foundEmpty = true;
+            }
+        });
+        return foundEmpty;
+    };
+
     const addField = () => {
         const newTemplate = template.slice();
         newTemplate.push('');
         setTemplate(newTemplate);
+
+        setTemplateValid(false);
     };
 
     const removeField = (fieldIndex) => {
         const newTemplate = template.slice();
         newTemplate.splice(fieldIndex, 1);
+
         setTemplate(newTemplate);
+        setTemplateValid(!hasEmptyField(newTemplate));
     };
 
     const updateField = (event, fieldIndex) => {
         const newTemplate = template.slice();
         newTemplate[fieldIndex] = event.target.value;
+
         setTemplate(newTemplate);
+        setTemplateValid(!hasEmptyField(newTemplate));
     };
 
     const renderTemplateField = (input, index) => (
@@ -77,9 +93,10 @@ const TemplateSetting = ({
             <div className="settings-template-field-group" draggable onDragStart={preventDrag}>
                 <InputGroup>
                     <FormControl
-                        placeholder="Field Name"
+                        placeholder="Field Name (Cannot be blank)"
                         value={input}
                         onChange={(event) => updateField(event, index)}
+                        isInvalid={input === ''}
                     />
                     <InputGroup.Append>
                         <Button variant="outline-danger" onClick={() => removeField(index)}>
@@ -95,6 +112,8 @@ const TemplateSetting = ({
         <div>
             <h5>Default Template</h5>
             <Form>
+                {hasEmptyField(template) ? <div className="settings-template-error">Field names cannot be empty</div> : null}
+
                 <div className="settings-template">
                     {template.map(renderTemplateField)}
 
@@ -112,6 +131,7 @@ const TemplateSetting = ({
 TemplateSetting.propTypes = {
     template: PropTypes.arrayOf(PropTypes.string).isRequired,
     setTemplate: PropTypes.func.isRequired,
+    setTemplateValid: PropTypes.func.isRequired,
 };
 
 export default TemplateSetting;
