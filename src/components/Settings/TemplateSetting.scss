@@ -1,0 +1,40 @@
+.settings-template {
+    width: 100%;
+}
+
+.settings-template-field {
+    display: flex;
+    padding: 0.5rem;
+    cursor: grab;
+}
+
+.settings-template-field-dragging {
+    @extend .settings-template-field;
+
+    cursor: grabbing;
+    background-color: #e6e6e6;
+}
+
+.settings-template-field-icon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 60px;
+    font-size: 1rem;
+}
+
+.settings-template-field-group {
+    width: 100%;
+}
+
+.settings-template-field:hover {
+    background-color: #e6e6e6;
+}
+
+.settings-template-field-add-button-wrapper {
+    margin-top: 0.5rem;
+}
+
+.settings-template-field-add-button {
+    width: 100%;
+}

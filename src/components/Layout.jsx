@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import DirectoryViewPanel from './FileNavigation/DirectoryViewPanel';
 import HeaderComponent from './Header/HeaderComponent';
-import VerticalModal from './VerticalModal/VerticalModal';
+import SettingsModal from '../containers/Settings/SettingsModal';
 import './Layout.scss';
 import { concatPaths, ITEM_TYPES } from '../service';
 
@@ -28,7 +28,7 @@ const Layout = () => {
                 <DirectoryViewPanel selectedItemPath={selectedItemPath} onFileOpen={setFileOpen} onSelectItem={onSelectItem} />
             </div>
             <div>
-                <VerticalModal
+                <SettingsModal
                     show={showModal}
                     onHide={() => setShowModal(false)}
                 />

@@ -1,9 +1,7 @@
 import actionTypes from '../actions/actionTypes';
 
 const DEFAULT_STATE = {
-    data: {
-        template: ['username', 'password'],
-    },
+    template: ['Username', 'Password', 'test1', 'test2', 'test3'],
 };
 
 export default (state = DEFAULT_STATE, action) => {
@@ -11,10 +9,7 @@ export default (state = DEFAULT_STATE, action) => {
         case actionTypes.UPDATE_TEMPLATE:
             return {
                 ...state,
-                data: {
-                    ...state.data,
-                    template: action.payload,
-                },
+                template: action.payload,
             };
         default:
             return state;
