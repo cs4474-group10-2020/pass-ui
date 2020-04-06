@@ -12,6 +12,7 @@ import {
     concatPaths, generatePassword, isFileNameValid, isPasswordValid, trimGPGExtension, validPasswordFieldValue,
 } from '../../service';
 import './PasswordEditPanel.scss';
+import PasswordStrengthBar from './PasswordStrengthBar';
 
 const PasswordEditPanel = ({
     password, path, fileName, onSave, onClose, editFileName,
@@ -102,6 +103,9 @@ const PasswordEditPanel = ({
                             </Button>
                         </InputGroup.Append>
                     </InputGroup>
+
+                    <PasswordStrengthBar password={currentPassword} />
+
                     <Accordion activeKey={displayGenerationSettings ? '0' : null}>
                         <Accordion.Collapse eventKey="0">
                             <Form className="password-generation-form">
