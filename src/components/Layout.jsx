@@ -10,6 +10,7 @@ import PasswordDisplayPanel from '../containers/Password/PasswordDisplayPanel';
 import PasswordCreatePanel from '../containers/Password/PasswordCreatePanel';
 import PasswordEditPanel from '../containers/Password/PasswordEditPanel';
 import HeaderComponent from '../containers/Header/HeaderComponent';
+import ErrorPopup from '../containers/Error/ErrorPopup';
 
 const Layout = ({ getPassword, getDirectoryContents }) => {
     const [fileOpen, setFileOpen] = useState(null);
@@ -84,7 +85,6 @@ const Layout = ({ getPassword, getDirectoryContents }) => {
                     selectedItemType={selectedItemType}
                     selectedItemPath={selectedItemPath}
                     canEditSelectedItem={canEditSelectedItem}
-                    isLoading
                     setShowModal={setShowModal}
                     onCreatePassword={onCreatePassword}
                     onEditPassword={onEditPassword}
@@ -105,7 +105,7 @@ const Layout = ({ getPassword, getDirectoryContents }) => {
                     openDirectories={openDirectories}
                     onAddDirectoryStart={onAddDirectory}
                 />
-                {fileOpen && mode === MODES.view && <PasswordDisplayPanel />}
+                {fileOpen && mode === MODES.view && <PasswordDisplayPanel onEdit={() => setMode(MODES.edit)} />}
                 {fileOpen && mode === MODES.create && <PasswordCreatePanel path={fileOpen} fileName="" onClose={onClose} />}
                 {fileOpen && mode === MODES.edit && <PasswordEditPanel path={fileOpen} onClose={onClose} />}
 
@@ -114,6 +114,7 @@ const Layout = ({ getPassword, getDirectoryContents }) => {
                 show={showModal}
                 onHide={() => setShowModal(false)}
             />
+            <ErrorPopup />
         </div>
     );
 };

@@ -3,6 +3,13 @@ import actionTypes from './actionTypes';
 import { refreshAllDirectoryContents } from './directory';
 
 // eslint-disable-next-line import/prefer-default-export
+export const resetPasswordStore = () => (dispatch, getState) => new Promise((resolutionFunc) => {
+    exec('pass git reset HEAD --hard', () => {
+        refreshAllDirectoryContents()(dispatch, getState);
+        resolutionFunc();
+    });
+});
+
 export const syncPasswordStore = () => (dispatch, getState) => {
     dispatch({
         type: actionTypes.SYNC_PASSWORD_STORE_STARTED,
@@ -11,12 +18,11 @@ export const syncPasswordStore = () => (dispatch, getState) => {
     return new Promise((resolutionFunc, rejectionFunc) => {
         exec('pass git pull', (error, stdout, stderr) => {
             if (error) {
-                exec('pass git reset HEAD --hard', () => {
+                resetPasswordStore()(dispatch, getState).then(() => {
                     dispatch({
                         type: actionTypes.SYNC_PASSWORD_STORE_FAILURE,
                     });
                     rejectionFunc(error || stderr);
-                    refreshAllDirectoryContents()(dispatch);
                     dispatch({
                         type: actionTypes.SYNC_PASSWORD_STORE_ENDED,
                     });

@@ -6,6 +6,7 @@ import {
 } from '../service';
 import actionTypes from './actionTypes';
 import { getDirectoryContents } from './directory';
+import { resetPasswordStore } from './sync';
 
 
 // eslint-disable-next-line import/prefer-default-export
@@ -42,7 +43,7 @@ export const fetchPassword = (path) => (dispatch) => {
     });
 };
 
-export const savePassword = (path, password) => (dispatch) => {
+export const savePassword = (path, password) => (dispatch, getState) => {
     const fullPath = trimGPGExtension(concatPaths(path));
 
     dispatch({
@@ -64,6 +65,12 @@ export const savePassword = (path, password) => (dispatch) => {
             },
         )
             .then((process) => {
+                if (process.stderr) {
+                    throw new Error(process.stderr);
+                }
+                return process;
+            })
+            .then((process) => {
                 dispatch({
                     type: actionTypes.SAVE_PASSWORD_SUCCESS,
                     payload: process,
@@ -71,12 +78,14 @@ export const savePassword = (path, password) => (dispatch) => {
                 getDirectoryContents(path.slice(0, -1))(dispatch);
                 resolutionFunc();
             })
-            .catch((error) => {
-                dispatch({
-                    type: actionTypes.SAVE_PASSWORD_FAILURE,
-                    payload: error,
+            .catch(() => {
+                resetPasswordStore()(dispatch, getState).then(() => {
+                    dispatch({
+                        type: actionTypes.SAVE_PASSWORD_FAILURE,
+                        payload: { path, password },
+                    });
+                    rejectionFunc();
                 });
-                rejectionFunc();
             })
             .finally(() => {
                 dispatch({

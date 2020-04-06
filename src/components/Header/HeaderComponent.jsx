@@ -4,16 +4,18 @@ import Nav from 'react-bootstrap/Nav';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-    faSyncAlt, faPlus, faPencilAlt, faCog, faTrashAlt, faSpinner,
+    faSyncAlt, faPlus, faPencilAlt, faCog, faTrashAlt, faSpinner, faExclamationTriangle,
 } from '@fortawesome/free-solid-svg-icons';
 import './HeaderComponent.scss';
 import PropTypes from 'prop-types';
-import { Button, Dropdown } from 'react-bootstrap';
+import {
+    Button, Dropdown, OverlayTrigger, Tooltip,
+} from 'react-bootstrap';
 import { ITEM_TYPES, trimGPGExtension } from '../../service';
 
 const HeaderComponent = ({
     selectedItemType, selectedItemPath, canEditSelectedItem, isLoading, setShowModal,
-    onCreatePassword, onEditPassword, onDelete, onAddDirectory, onSync,
+    onCreatePassword, onEditPassword, onDelete, onAddDirectory, onSync, lastError,
 }) => (
     <Navbar bg="dark" variant="dark">
         <Nav className="mr-auto">
@@ -43,13 +45,26 @@ const HeaderComponent = ({
             >
                 <FontAwesomeIcon icon={faTrashAlt} size="3x" />
             </Button>
-            <Button className="header-item" onClick={() => onSync()}>
+            <Button variant="success" className="header-item" onClick={() => onSync()}>
                 <FontAwesomeIcon icon={faSyncAlt} size="3x" />
             </Button>
-            {isLoading && <FontAwesomeIcon className="header-item" icon={faSpinner} size="3x" spin color="white" />}
+            {(isLoading && (
+                <FontAwesomeIcon className="header-item" icon={faSpinner} size="3x" spin color="white" />
+            )) || (lastError.type !== null && (
+                <OverlayTrigger
+                    placement="bottom"
+                    overlay={(
+                        <Tooltip id="header-error-message-tooltip">{lastError.message}</Tooltip>
+                    )}
+                >
+                    <FontAwesomeIcon className="header-item" icon={faExclamationTriangle} size="3x" color="white" />
+                </OverlayTrigger>
+
+            ))}
+
         </Nav>
         <Nav className="navbar-nav ml-auto">
-            <Button className="header-item" onClick={() => setShowModal(true)}>
+            <Button variant="secondary" className="header-item" onClick={() => setShowModal(true)}>
                 <FontAwesomeIcon icon={faCog} size="3x" />
             </Button>
         </Nav>
@@ -67,6 +82,11 @@ HeaderComponent.propTypes = {
     onDelete: PropTypes.func.isRequired,
     onAddDirectory: PropTypes.func.isRequired,
     onSync: PropTypes.func.isRequired,
+    lastError: PropTypes.shape({
+        type: PropTypes.string,
+        payload: PropTypes.any,
+        message: PropTypes.string.isRequired,
+    }).isRequired,
 };
 
 export default HeaderComponent;

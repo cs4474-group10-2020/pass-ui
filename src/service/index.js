@@ -19,6 +19,10 @@ export const MODES = Object.freeze({
     none: 0, view: 1, create: 2, edit: 3,
 });
 
+export const STATUS_TYPES = Object.freeze({
+    deleteFile: 'deleteFile', renameFile: 'renameFile', openPassword: 'openPassword', sync: 'sync', savePassword: 'savePassword',
+});
+
 export const parsePassword = (passwordFile) => {
     const fileLines = passwordFile.split(/\r?\n/);
 
