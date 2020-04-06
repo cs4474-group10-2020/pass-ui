@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import Navbar from 'react-bootstrap/Navbar';
 import Nav from 'react-bootstrap/Nav';
 
@@ -12,64 +12,87 @@ import {
     Button, Dropdown, OverlayTrigger, Tooltip,
 } from 'react-bootstrap';
 import { ITEM_TYPES, trimGPGExtension } from '../../service';
+import DeleteConfirmModal from './DeleteConfirmModal';
 
 const HeaderComponent = ({
     selectedItemType, selectedItemPath, canEditSelectedItem, isLoading, setShowModal,
     onCreatePassword, onEditPassword, onDelete, onAddDirectory, onSync, lastError,
-}) => (
-    <Navbar bg="dark" variant="dark">
-        <Nav className="mr-auto">
-            <Dropdown className="header-item">
-                <Dropdown.Toggle disabled={selectedItemType !== ITEM_TYPES.directory}>
-                    <FontAwesomeIcon icon={faPlus} size="3x" />
-                </Dropdown.Toggle>
-                <Dropdown.Menu>
-                    <Dropdown.Item onClick={() => onAddDirectory(selectedItemPath)}>Folder</Dropdown.Item>
-                    <Dropdown.Item onClick={() => onCreatePassword(selectedItemPath)}>Password</Dropdown.Item>
-                </Dropdown.Menu>
-            </Dropdown>
-            <Button className="header-item" disabled={selectedItemType !== ITEM_TYPES.file} onClick={() => onEditPassword(selectedItemPath)}>
-                <FontAwesomeIcon icon={faPencilAlt} size="3x" />
-            </Button>
-            <Button
-                className="header-item"
-                variant="danger"
-                disabled={selectedItemType === ITEM_TYPES.none || !canEditSelectedItem}
-                onClick={() => {
-                    if (selectedItemType === ITEM_TYPES.directory) {
-                        onDelete(selectedItemPath);
-                    } else {
-                        onDelete([...selectedItemPath.slice(0, -1), trimGPGExtension(selectedItemPath[selectedItemPath.length - 1])]);
-                    }
-                }}
-            >
-                <FontAwesomeIcon icon={faTrashAlt} size="3x" />
-            </Button>
-            <Button variant="success" className="header-item" onClick={() => onSync()}>
-                <FontAwesomeIcon icon={faSyncAlt} size="3x" />
-            </Button>
-            {(isLoading && (
-                <FontAwesomeIcon className="header-item" icon={faSpinner} size="3x" spin color="white" />
-            )) || (lastError.type !== null && (
-                <OverlayTrigger
-                    placement="bottom"
-                    overlay={(
-                        <Tooltip id="header-error-message-tooltip">{lastError.message}</Tooltip>
-                    )}
+}) => {
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [toDelete, setToDelete] = useState(null);
+
+    const closeDeleteConfirm = (confirmed) => {
+        if (confirmed) {
+            onDelete(toDelete);
+        }
+        setShowDeleteConfirm(false);
+        setToDelete(null);
+    };
+
+    return (
+        <Navbar bg="dark" variant="dark">
+            <Nav className="mr-auto">
+                <Dropdown className="header-item">
+                    <Dropdown.Toggle disabled={selectedItemType !== ITEM_TYPES.directory}>
+                        <FontAwesomeIcon icon={faPlus} size="3x" />
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>
+                        <Dropdown.Item onClick={() => onAddDirectory(selectedItemPath)}>Folder</Dropdown.Item>
+                        <Dropdown.Item onClick={() => onCreatePassword(selectedItemPath)}>Password</Dropdown.Item>
+                    </Dropdown.Menu>
+                </Dropdown>
+                <Button className="header-item" disabled={selectedItemType !== ITEM_TYPES.file} onClick={() => onEditPassword(selectedItemPath)}>
+                    <FontAwesomeIcon icon={faPencilAlt} size="3x" />
+                </Button>
+                <Button
+                    className="header-item"
+                    variant="danger"
+                    disabled={selectedItemType === ITEM_TYPES.none || !canEditSelectedItem}
+                    onClick={() => {
+                        if (selectedItemType === ITEM_TYPES.directory) {
+                            setToDelete(selectedItemPath);
+                            setShowDeleteConfirm(true);
+                        } else {
+                            setToDelete([...selectedItemPath.slice(0, -1), trimGPGExtension(selectedItemPath[selectedItemPath.length - 1])]);
+                            setShowDeleteConfirm(true);
+                        }
+                    }}
                 >
-                    <FontAwesomeIcon className="header-item" icon={faExclamationTriangle} size="3x" color="white" />
-                </OverlayTrigger>
+                    <FontAwesomeIcon icon={faTrashAlt} size="3x" />
+                </Button>
+                <Button variant="success" className="header-item" onClick={() => onSync()}>
+                    <FontAwesomeIcon icon={faSyncAlt} size="3x" />
+                </Button>
+                {(isLoading && (
+                    <FontAwesomeIcon className="header-item" icon={faSpinner} size="3x" spin color="white" />
+                )) || (lastError.type !== null && (
+                    <OverlayTrigger
+                        placement="bottom"
+                        overlay={(
+                            <Tooltip id="header-error-message-tooltip">{lastError.message}</Tooltip>
+                        )}
+                    >
+                        <FontAwesomeIcon className="header-item" icon={faExclamationTriangle} size="3x" color="white" />
+                    </OverlayTrigger>
 
-            ))}
+                ))}
 
-        </Nav>
-        <Nav className="navbar-nav ml-auto">
-            <Button variant="secondary" className="header-item" onClick={() => setShowModal(true)}>
-                <FontAwesomeIcon icon={faCog} size="3x" />
-            </Button>
-        </Nav>
-    </Navbar>
-);
+            </Nav>
+            <Nav className="navbar-nav ml-auto">
+                <Button variant="secondary" className="header-item" onClick={() => setShowModal(true)}>
+                    <FontAwesomeIcon icon={faCog} size="3x" />
+                </Button>
+            </Nav>
+
+            <DeleteConfirmModal
+                contentToDelete={toDelete == null ? null : toDelete.slice(1).join('/')}
+                onConfirm={() => closeDeleteConfirm(true)}
+                onHide={() => closeDeleteConfirm(false)}
+                show={showDeleteConfirm}
+            />
+        </Navbar>
+    );
+};
 
 HeaderComponent.propTypes = {
     selectedItemType: PropTypes.oneOf(Object.values(ITEM_TYPES)).isRequired,
