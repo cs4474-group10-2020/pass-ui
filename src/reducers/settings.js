@@ -1,7 +1,7 @@
 import actionTypes from '../actions/actionTypes';
 
 const DEFAULT_STATE = {
-    template: ['Username', 'Password'],
+    template: ['Username'],
 };
 
 export default (state = DEFAULT_STATE, action) => {
@@ -15,3 +15,5 @@ export default (state = DEFAULT_STATE, action) => {
             return state;
     }
 };
+
+export const getTemplate = (state) => state.template;

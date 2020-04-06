@@ -13,6 +13,8 @@
         "bootstrap": "^4.4.1",
         "electron": "^8.1.1",
         "electron-is-dev": "^1.1.0",
+        "execa": "^4.0.0",
+        "generate-password": "^1.5.1",
         "jquery": "^3.4.1",
         "node-sass": "^4.13.0",
         "popper.js": "^1.16.1",
@@ -28,7 +30,9 @@
         "redux-logger": "^3.0.6",
         "redux-persist": "^6.0.0",
         "redux-promise": "^0.6.0",
-        "redux-thunk": "^2.3.0"
+        "redux-thunk": "^2.3.0",
+        "sanitize-filename": "^1.6.3",
+        "zxcvbn": "^4.4.2"
     },
     "homepage": "./",
     "main": "public/electron.js",

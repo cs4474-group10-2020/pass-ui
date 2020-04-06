@@ -1,42 +1,46 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
-import { Button, FormControl, ListGroup } from 'react-bootstrap';
-import { faMinus, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { Button, ListGroup } from 'react-bootstrap';
+import { faFolder, faFolderOpen } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { ContextMenuTrigger } from 'react-contextmenu';
-import { concatPaths, ITEM_TYPES } from '../../service';
-import File from './File';
+import { concatPaths, DIRECTORY_EDIT_TYPES, ITEM_TYPES } from '../../service';
 // eslint-disable-next-line import/no-cycle
 import DirectoryChild from '../../containers/FileNavigation/Directory';
 import './Directory.scss';
 import RightClickMenu from './RightClickMenu';
 import AddDirectoryForm from './AddDirectoryForm';
+import File from '../../containers/FileNavigation/File';
 
 
 const Directory = ({
-    directoryChildren, path, getDirectoryContents, onFileOpen, selectedItemPath, onSelectItem, canRename,
+    directoryChildren, path, getDirectoryContents, onFileOpen, selectedItemPath, onSelectItem, setEdit, editDirectoryPath, editType,
+    onAddDirectoryStart, canEdit, onCreatePassword, onEditPassword, onCreateDirectory, onDeleteDirectory, onRenameDirectory,
+    onDirectoryChangeOpenState, openDirectories,
 }) => {
-    const [isOpen, setIsOpen] = useState(false);
-    const [isBeingRenamed, setIsBeingRenamed] = useState(false);
-    const [isAddingDirectory, setIsAddingDirectory] = useState(false);
-    const [directoryName, setDirectoryName] = useState(path[path.length - 1]);
+    const directoryName = path[path.length - 1];
     const pathString = concatPaths(path);
-    const isSelected = pathString === selectedItemPath;
+    const isOpen = openDirectories.includes(pathString);
+    const isAddingDirectory = pathString === concatPaths(editDirectoryPath) && editType === DIRECTORY_EDIT_TYPES.addChild;
+    const isBeingRenamed = pathString === concatPaths(editDirectoryPath) && editType === DIRECTORY_EDIT_TYPES.rename;
+    const isSelected = pathString === concatPaths(selectedItemPath);
     const onNewPassword = () => {
-        // TODO
+        onCreatePassword(path);
     };
     const onNewDirectory = () => {
-        getDirectoryContents(path);
-        setIsOpen(true);
-        setIsAddingDirectory(true);
+        onAddDirectoryStart(path);
     };
     const onRename = () => {
-        setIsAddingDirectory(false);
-        setIsBeingRenamed(true);
+        setEdit(path, DIRECTORY_EDIT_TYPES.rename);
+    };
+
+    const onRenameComplete = (newDirectoryName) => {
+        setEdit([], DIRECTORY_EDIT_TYPES.none);
+        onRenameDirectory(path, [...path.slice(0, -1), newDirectoryName]);
     };
 
     const onDelete = () => {
-        // TODO
+        onDeleteDirectory(path);
     };
 
     const rightClickMenuOptions = [
@@ -50,7 +54,7 @@ const Directory = ({
         },
     ];
 
-    if (canRename) {
+    if (canEdit) {
         rightClickMenuOptions.push({
             menuItem: 'Rename',
             callback: onRename,
@@ -69,32 +73,28 @@ const Directory = ({
                         className="expand-button"
                         onClick={() => {
                             getDirectoryContents(path);
-                            setIsOpen(!isOpen);
+                            onDirectoryChangeOpenState(path);
                         }}
                     >
                         <FontAwesomeIcon
                             className="directory-icon"
                             size="2x"
-                            icon={isOpen ? faMinus : faPlus}
+                            icon={isOpen ? faFolder : faFolderOpen}
                         />
                     </Button>
                     {isBeingRenamed ? (
-                        <FormControl
-                            as="input"
-                            value={directoryName}
-                            onChange={(event) => setDirectoryName(event.target.value)}
-                            onKeyPress={(event) => {
-                                if (event.key === 'Enter') {
-                                    setIsBeingRenamed(false);
-                                    // TODO rename
-                                }
+                        <AddDirectoryForm
+                            onSubmit={onRenameComplete}
+                            onCancel={() => {
+                                setEdit([], DIRECTORY_EDIT_TYPES.none);
                             }}
+                            initialValue={path[path.length - 1]}
                         />
                     ) : (
                         // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions,jsx-a11y/click-events-have-key-events
                         <h1
                             onClick={() => {
-                                onSelectItem(path, ITEM_TYPES.directory);
+                                onSelectItem(path, ITEM_TYPES.directory, canEdit);
                             }}
                             className="directory-name-text"
                         >
@@ -112,13 +112,17 @@ const Directory = ({
             {isOpen && (
                 <ListGroup>
                     {isAddingDirectory && (
-                        <AddDirectoryForm
-                            onSubmit={(name) => {
-                                setIsAddingDirectory(false);
-                                // TODO add new dir
-                            }}
-                            onCancel={() => setIsAddingDirectory(false)}
-                        />
+                        <ListGroup.Item variant={isSelected ? 'primary' : null} className="directory-child">
+                            <div className="directory-name">
+                                <AddDirectoryForm
+                                    onSubmit={(name) => {
+                                        setEdit([], DIRECTORY_EDIT_TYPES.none);
+                                        onCreateDirectory([...path, name]);
+                                    }}
+                                    onCancel={() => setEdit([], DIRECTORY_EDIT_TYPES.none)}
+                                />
+                            </div>
+                        </ListGroup.Item>
                     )}
                     {directoryChildren.directories.map(((directory) => {
                         const childPath = [...path, directory];
@@ -129,7 +133,15 @@ const Directory = ({
                                 key={concatPaths(childPath)}
                                 path={childPath}
                                 onFileOpen={onFileOpen}
-                                canRename
+                                canEdit
+                                onCreatePassword={onCreatePassword}
+                                onEditPassword={onEditPassword}
+                                setEdit={setEdit}
+                                editDirectoryPath={editDirectoryPath}
+                                editType={editType}
+                                onDirectoryChangeOpenState={onDirectoryChangeOpenState}
+                                openDirectories={openDirectories}
+                                onAddDirectoryStart={onAddDirectoryStart}
                             />
                         );
                     }))}
@@ -142,6 +154,7 @@ const Directory = ({
                                 key={concatPaths(childPath)}
                                 path={childPath}
                                 onOpen={onFileOpen}
+                                onEditPassword={onEditPassword}
                             />
                         );
                     }))}
@@ -160,9 +173,20 @@ Directory.propTypes = {
     path: PropTypes.arrayOf(PropTypes.string).isRequired,
     getDirectoryContents: PropTypes.func.isRequired,
     onFileOpen: PropTypes.func.isRequired,
-    selectedItemPath: PropTypes.string.isRequired,
+    selectedItemPath: PropTypes.arrayOf(PropTypes.string).isRequired,
     onSelectItem: PropTypes.func.isRequired,
-    canRename: PropTypes.bool,
+    canEdit: PropTypes.bool,
+    onCreatePassword: PropTypes.func.isRequired,
+    onEditPassword: PropTypes.func.isRequired,
+    onCreateDirectory: PropTypes.func.isRequired,
+    onDeleteDirectory: PropTypes.func.isRequired,
+    onRenameDirectory: PropTypes.func.isRequired,
+    setEdit: PropTypes.func.isRequired,
+    editDirectoryPath: PropTypes.arrayOf(PropTypes.string).isRequired,
+    editType: PropTypes.oneOf(Object.values(DIRECTORY_EDIT_TYPES)).isRequired,
+    onDirectoryChangeOpenState: PropTypes.func.isRequired,
+    openDirectories: PropTypes.arrayOf(PropTypes.string).isRequired,
+    onAddDirectoryStart: PropTypes.func.isRequired,
 };
 
 Directory.defaultProps = {
@@ -170,7 +194,7 @@ Directory.defaultProps = {
         files: [],
         directories: [],
     },
-    canRename: false,
+    canEdit: false,
 };
 
 export default Directory;

@@ -1,10 +1,20 @@
 
 .layout {
     display: flex;
+    flex-direction: column;
+    height: 100vh;
+    max-height: 100vh;
+}
+
+.content {
+    display: flex;
     flex-direction: row;
-    width: 100%;
+    overflow: auto;
+    flex: 1 1 auto;
 }
 .directory-view-panel {
     width: 50%;
+    margin: 10px;
+    overflow-y: scroll;
 }
 
