@@ -5,7 +5,7 @@ import {
     concatPaths, getPasswordStorePath, getPasswordString, parsePassword, trimGPGExtension,
 } from '../service';
 import actionTypes from './actionTypes';
-import { getDirectoryContents } from './directory';
+import { refreshAllDirectoryContents } from './directory';
 import { resetPasswordStore } from './sync';
 
 
@@ -75,7 +75,7 @@ export const savePassword = (path, password) => (dispatch, getState) => {
                     type: actionTypes.SAVE_PASSWORD_SUCCESS,
                     payload: process,
                 });
-                getDirectoryContents(path.slice(0, -1))(dispatch);
+                refreshAllDirectoryContents()(dispatch, getState);
                 resolutionFunc();
             })
             .catch(() => {

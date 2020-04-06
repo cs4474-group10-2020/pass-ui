@@ -1,7 +1,7 @@
 import { exec } from 'child_process';
 import { concatPaths } from '../service';
 import actionTypes from './actionTypes';
-import { getDirectoryContents } from './directory';
+import { refreshAllDirectoryContents } from './directory';
 import { resetPasswordStore } from './sync';
 
 
@@ -30,7 +30,7 @@ export const deleteFile = (path) => (dispatch, getState) => {
                     payload: path,
                 });
                 resolutionFunc();
-                getDirectoryContents(path.slice(0, -1))(dispatch);
+                refreshAllDirectoryContents()(dispatch, getState);
             }
             dispatch({
                 type: actionTypes.DELETE_FILE_ENDED,
@@ -74,8 +74,7 @@ export const renameFile = (previousPath, newPath) => (dispatch, getState) => {
                     },
                 });
                 resolutionFunc();
-                getDirectoryContents(previousPath.slice(0, -1))(dispatch);
-                getDirectoryContents(newPath.slice(0, -1))(dispatch);
+                refreshAllDirectoryContents()(dispatch, getState);
             }
             dispatch({
                 type: actionTypes.RENAME_FILE_ENDED,
