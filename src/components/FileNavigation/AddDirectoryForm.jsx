@@ -6,10 +6,12 @@ import { faCheck, faTimes } from '@fortawesome/free-solid-svg-icons';
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import './AddDirectoryForm.scss';
+import { isFileNameValid } from '../../service';
 
 
 const AddDirectoryForm = ({ onSubmit, onCancel, initialValue }) => {
     const [name, setName] = useState(initialValue);
+    const isValid = isFileNameValid(name);
     return (
         <InputGroup className="add-directory-form">
             <FormControl
@@ -21,9 +23,11 @@ const AddDirectoryForm = ({ onSubmit, onCancel, initialValue }) => {
                         onSubmit(name);
                     }
                 }}
+                isInvalid={!isValid}
             />
             <InputGroup.Append>
                 <Button
+                    disabled={!isValid}
                     variant="outline-success"
                     onClick={() => onSubmit(name)}
                 >

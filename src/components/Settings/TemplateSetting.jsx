@@ -6,6 +6,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faPlus, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
 import './TemplateSetting.scss';
+import { validPasswordFieldValue } from '../../service';
 
 const TemplateSetting = ({
     template, setTemplate, setTemplateValid,
@@ -43,14 +44,14 @@ const TemplateSetting = ({
         setDragIndex(null);
     };
 
-    const hasEmptyField = (templateToCheck) => {
-        let foundEmpty = false;
+    const hasInvalidField = (templateToCheck) => {
+        let invalid = false;
         templateToCheck.forEach((field) => {
-            if (field === '') {
-                foundEmpty = true;
+            if (!validPasswordFieldValue(field)) {
+                invalid = true;
             }
         });
-        return foundEmpty;
+        return invalid;
     };
 
     const addField = () => {
@@ -66,7 +67,7 @@ const TemplateSetting = ({
         newTemplate.splice(fieldIndex, 1);
 
         setTemplate(newTemplate);
-        setTemplateValid(!hasEmptyField(newTemplate));
+        setTemplateValid(!hasInvalidField(newTemplate));
     };
 
     const updateField = (event, fieldIndex) => {
@@ -74,7 +75,7 @@ const TemplateSetting = ({
         newTemplate[fieldIndex] = event.target.value;
 
         setTemplate(newTemplate);
-        setTemplateValid(!hasEmptyField(newTemplate));
+        setTemplateValid(!hasInvalidField(newTemplate));
     };
 
     const renderTemplateField = (input, index) => (
@@ -96,7 +97,7 @@ const TemplateSetting = ({
                         placeholder="Field Name (Cannot be blank)"
                         value={input}
                         onChange={(event) => updateField(event, index)}
-                        isInvalid={input === ''}
+                        isInvalid={!validPasswordFieldValue(input)}
                     />
                     <InputGroup.Append>
                         <Button variant="outline-danger" onClick={() => removeField(index)}>
@@ -112,7 +113,7 @@ const TemplateSetting = ({
         <div>
             <h5>Default Template</h5>
             <Form>
-                {hasEmptyField(template) ? <div className="settings-template-error">Field names cannot be empty</div> : null}
+                {hasInvalidField(template) ? <div className="settings-template-error">Field names cannot be empty or contain colons</div> : null}
 
                 <div className="settings-template">
                     {template.map(renderTemplateField)}

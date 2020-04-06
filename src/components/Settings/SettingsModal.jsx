@@ -16,10 +16,8 @@ const SettingsModal = ({
     };
 
     const saveAndHide = () => {
-        if (isTemplateValid) {
-            setTemplate(draftTemplate);
-            onHide();
-        }
+        setTemplate(draftTemplate);
+        onHide();
     };
 
     return (
@@ -41,7 +39,7 @@ const SettingsModal = ({
             <Modal.Footer>
                 <div className="settings-modal-footer">
                     <Button variant="secondary" onClick={discardAndHide}>Cancel</Button>
-                    <Button variant="success" onClick={saveAndHide}>Save</Button>
+                    <Button variant="success" disabled={!isTemplateValid} onClick={saveAndHide}>Save</Button>
                 </div>
             </Modal.Footer>
         </Modal>

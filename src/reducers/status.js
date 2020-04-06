@@ -4,6 +4,7 @@ import { concatPaths, STATUS_TYPES, trimGPGExtension } from '../service';
 const DEFAULT_STATE = {
     loadingActions: {},
     lastError: {
+        shown: false,
         type: null,
         payload: null,
         message: '',
@@ -26,9 +27,10 @@ const removeLoadingAction = (action, state) => ({
     },
 });
 
-const addFailure = (type, payload, message, state) => ({
+const addFailure = (type, payload, message, state, shown = true) => ({
     ...state,
     lastError: {
+        shown,
         type,
         payload,
         message,
@@ -62,8 +64,7 @@ export default (state = DEFAULT_STATE, action) => {
         case actionTypes.FETCH_PASSWORD_CONTENTS_SUCCESS:
         case actionTypes.SYNC_PASSWORD_STORE_SUCCESS:
         case actionTypes.SAVE_PASSWORD_SUCCESS:
-        case actionTypes.HIDE_ERROR:
-            return addFailure(null, action.payload, '', state);
+            return addFailure(null, action.payload, '', state, false);
         case actionTypes.DELETE_FILE_FAILURE:
             return addFailure(
                 STATUS_TYPES.deleteFile,
@@ -99,6 +100,14 @@ export default (state = DEFAULT_STATE, action) => {
                 `Could not save ${concatPaths(action.payload.path)}.`,
                 state,
             );
+        case actionTypes.HIDE_ERROR:
+            return {
+                ...state,
+                lastError: {
+                    ...state.lastError,
+                    shown: false,
+                },
+            };
         default:
             return state;
     }

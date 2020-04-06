@@ -1,12 +1,16 @@
 /* eslint-disable react/no-array-index-key */
 import {
-    Button, Card, FormControl, InputGroup, ListGroup,
+    Accordion, Button, Card, Col, Form, FormControl, InputGroup, ListGroup,
 } from 'react-bootstrap';
 import React, { useState } from 'react';
-import { faBars, faPlus, faTrashAlt } from '@fortawesome/free-solid-svg-icons';
+import {
+    faBars, faCog, faDice, faPlus, faTrashAlt,
+} from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import PropTypes from 'prop-types';
-import { concatPaths, trimGPGExtension } from '../../service';
+import {
+    concatPaths, generatePassword, isFileNameValid, isPasswordValid, trimGPGExtension, validPasswordFieldValue,
+} from '../../service';
 import './PasswordEditPanel.scss';
 
 const PasswordEditPanel = ({
@@ -16,6 +20,10 @@ const PasswordEditPanel = ({
     const [fields, setFields] = useState(password.fields);
     const [currentFileName, setCurrentFileName] = useState(fileName);
     const [dragIndex, setDragIndex] = useState(null);
+    const [displayGenerationSettings, setDisplayGenerationSettings] = useState(false);
+    const [passwordLength, setPasswordLength] = useState(12);
+    const [includeSpecialCharacters, setIncludeSpecialCharacters] = useState(true);
+    const [includeNumbers, setIncludeNumbers] = useState(true);
 
     const preventDrag = (event) => {
         event.preventDefault();
@@ -48,13 +56,18 @@ const PasswordEditPanel = ({
         setDragIndex(null);
     };
 
+    const createNewPassword = () => ({
+        password: currentPassword,
+        fields,
+    });
     return (
         <Card className="password-display-panel">
-            <Card.Header>
+            <Card.Header className="password-display-panel-header">
                 {editFileName ? (
                     <>
                         {trimGPGExtension(concatPaths(path))}
                         <FormControl
+                            isInvalid={!isFileNameValid(currentFileName)}
                             placeholder="Name"
                             aria-label="Name"
                             value={currentFileName}
@@ -68,15 +81,65 @@ const PasswordEditPanel = ({
                 ) }
             </Card.Header>
             <ListGroup variant="flush" className="field-group">
-                <ListGroup.Item>
-                    <FormControl
-                        placeholder="Password"
-                        aria-label="Password"
-                        value={currentPassword}
-                        onChange={(changeEvent) => setCurrentPassword(changeEvent.target.value)}
-                    />
+                <ListGroup.Item className="password-display-panel-header">
+                    <InputGroup>
+                        <FormControl
+                            isInvalid={currentPassword === ''}
+                            placeholder="Password"
+                            aria-label="Password"
+                            value={currentPassword}
+                            onChange={(changeEvent) => setCurrentPassword(changeEvent.target.value)}
+                        />
+                        <InputGroup.Append>
+                            <Button
+                                variant="outline-primary"
+                                onClick={() => setCurrentPassword(generatePassword(passwordLength, includeNumbers, includeSpecialCharacters))}
+                            >
+                                <FontAwesomeIcon icon={faDice} />
+                            </Button>
+                            <Button variant="outline-secondary" onClick={() => setDisplayGenerationSettings(!displayGenerationSettings)}>
+                                <FontAwesomeIcon icon={faCog} />
+                            </Button>
+                        </InputGroup.Append>
+                    </InputGroup>
+                    <Accordion activeKey={displayGenerationSettings ? '0' : null}>
+                        <Accordion.Collapse eventKey="0">
+                            <Form className="password-generation-form">
+                                <Form.Row>
+                                    <Form.Group md="6" as={Col} className="password-length-field password-generation-form-col">
+                                        <Form.Label>
+                                            Password Length
+                                        </Form.Label>
+                                        <Form.Control
+                                            type="number"
+                                            value={passwordLength}
+                                            onChange={(changeEvent) => setPasswordLength(changeEvent.target.value)}
+                                        />
+                                    </Form.Group>
+                                    <Col className="password-generation-form-col">
+                                        <Form.Check
+                                            checked={includeNumbers}
+                                            onChange={(changeEvent) => setIncludeNumbers(changeEvent.target.checked)}
+                                            inline
+                                            type="checkbox"
+                                            label="Numbers"
+                                        />
+                                    </Col>
+                                    <Col className="password-generation-form-col">
+                                        <Form.Check
+                                            checked={includeSpecialCharacters}
+                                            onChange={(changeEvent) => setIncludeSpecialCharacters(changeEvent.target.checked)}
+                                            inline
+                                            type="checkbox"
+                                            label="Special Characters"
+                                        />
+                                    </Col>
+                                </Form.Row>
+                            </Form>
+                        </Accordion.Collapse>
+                    </Accordion>
                 </ListGroup.Item>
-                <ListGroup.Item>
+                <ListGroup.Item className="password-field-list">
                     {fields.map(({ key, value }, index) => (
                         <div
                             key={index}
@@ -85,10 +148,12 @@ const PasswordEditPanel = ({
                             onDragStart={(event) => startDrag(event, index)}
                             onDrop={(event) => dropDrag(event, index)}
                             onDragOver={allowDrag}
+                            style={{ backgroundColor: dragIndex === index ? '#e6e6e6' : null }}
                         >
                             <FontAwesomeIcon className="field-drag-icon" icon={faBars} size="1x" />
                             <InputGroup draggable onDragStart={preventDrag}>
                                 <FormControl
+                                    isInvalid={!validPasswordFieldValue(key)}
                                     placeholder="Field name"
                                     aria-label="Field name"
                                     value={key}
@@ -103,6 +168,7 @@ const PasswordEditPanel = ({
                                     }))}
                                 />
                                 <FormControl
+                                    isInvalid={!validPasswordFieldValue(value)}
                                     placeholder="Value"
                                     aria-label="Value"
                                     value={value}
@@ -140,13 +206,11 @@ const PasswordEditPanel = ({
                 <Button
                     className="password-edit-panel-button accept-button"
                     variant="success"
+                    disabled={!isPasswordValid(currentFileName, createNewPassword())}
                     onClick={() => {
                         onSave(
                             [...path, currentFileName],
-                            ({
-                                password: currentPassword,
-                                fields,
-                            }),
+                            createNewPassword(),
                         );
                         onClose();
                     }}
